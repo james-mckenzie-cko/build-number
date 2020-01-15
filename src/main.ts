@@ -52,7 +52,7 @@ async function main() {
   async function pushReleaseTag(tag: { ref: string; sha: string }) {
     try {
       await instance.post(
-        `/repos/${process.env.GITHUB_REPOSITORY}/git/tags`,
+        `/repos/${process.env.GITHUB_REPOSITORY}/git/refs`,
         tag
       );
     } catch (e) {
