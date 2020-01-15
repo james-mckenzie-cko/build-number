@@ -17,29 +17,43 @@ async function main() {
 
   if (releaseTags.length === 0) {
     nextRelease = createTagName(1);
+  } else {
+    nextRelease = createTagName(Math.max(...releaseTags) + 1);
   }
 
-  console.log(releaseTags);
+  await pushReleaseTag(nextRelease);
 
   async function getReleaseTags() {
-    const result = await instance.get<
-      {
-        name: string;
-      }[]
-    >(`/repos/${process.env.GITHUB_REPOSITORY}/tags`);
+    try {
+      const result = await instance.get<
+        {
+          name: string;
+        }[]
+      >(`/repos/${process.env.GITHUB_REPOSITORY}/tags`);
 
-    console.log(result.data);
+      if (result.data) {
+        const regExpString = `/${tagPrefix}\d+$/`;
+        const regExp = new RegExp(regExpString);
 
-    if (result.data) {
-      const regExpString = `/${tagPrefix}\d+$`;
-      const regExp = new RegExp(regExpString);
-
-      return result.data
-        .filter(x => regExp.test(x.name))
-        .map(x => x.name.replace(tagPrefix, ''));
+        return result.data
+          .filter(x => regExp.test(x.name))
+          .map(x => Number(x.name.replace(tagPrefix, '')))
+          .sort();
+      }
+      return [];
+    } catch (e) {
+      core.setFailed(`Couldn't get Release Tags : ${e.message}`);
+    } finally {
+      return [];
     }
+  }
 
-    return [];
+  async function pushReleaseTag(tag: { ref: string; sha: string }) {
+    try {
+      await instance.post(`/repos/${process.env.GITHUB_REPOSITORY}/tags`, tag);
+    } catch (e) {
+      core.setFailed(`Couldn't push Release Tag : ${e.message}`);
+    }
   }
 
   function createTagName(buildNumber: number) {
@@ -49,14 +63,5 @@ async function main() {
     };
   }
 }
-
-/*
-    get all tags that match pattern
-    if no tags, set to 1, end.
-
-    order tags, get latest
-    create new tag of latest + 1
-    push new tag
-*/
 
 main();
