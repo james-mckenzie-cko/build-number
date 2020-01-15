@@ -9,6 +9,11 @@
   "scripts": {
     "build": "rm -rf ./lib && ncc build src/main.ts -o lib"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn build"
+    }
+  },
   "dependencies": {
     "@actions/core": "^1.2.0",
     "axios": "^0.19.1"
@@ -16,6 +21,7 @@
   "devDependencies": {
     "@types/node": "^12.0.4",
     "@zeit/ncc": "^0.20.5",
+    "husky": "^4.0.9",
     "prettier": "1.19.1",
     "typescript": "^3.5.1"
   }
