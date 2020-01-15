@@ -1,9 +1,9 @@
 name: 'Build Number Generator'
 description: 'Generate sequential build numbers for workflow runs'
-author: 'Einar Egilsson'
+author: 'James McKenzie'
 runs:
   using: 'node12'
-  main: 'main.js'
+  main: 'lib/index.js'
 inputs:
   deleteOlderTags:
     description: 'instruct the action to remove older tags after adding the latest'
