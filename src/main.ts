@@ -13,8 +13,6 @@ async function main() {
 
   const releaseTags = await getReleaseTags();
 
-  console.log(releaseTags);
-
   let nextRelease;
 
   if (releaseTags.length === 0) {
@@ -40,12 +38,7 @@ async function main() {
         const regExp = new RegExp(regExpString);
 
         return result.data
-          .filter(x => {
-            console.log(regExp.test(x.name));
-            console.log(x.name);
-
-            return regExp.test(x.name);
-          })
+          .filter(x => regExp.test(x.name))
           .map(x => Number(x.name.replace(tagPrefix, '')))
           .sort();
       }
