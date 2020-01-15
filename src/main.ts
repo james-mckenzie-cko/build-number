@@ -51,7 +51,10 @@ async function main() {
 
   async function pushReleaseTag(tag: { ref: string; sha: string }) {
     try {
-      await instance.post(`/repos/${process.env.GITHUB_REPOSITORY}/tags`, tag);
+      await instance.post(
+        `/repos/${process.env.GITHUB_REPOSITORY}/git/tags`,
+        tag
+      );
     } catch (e) {
       core.setFailed(`Couldn't push Release Tag : ${e.message}`);
     }
