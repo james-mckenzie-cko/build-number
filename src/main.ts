@@ -13,6 +13,8 @@ async function main() {
 
   const releaseTags = await getReleaseTags();
 
+  console.log(releaseTags);
+
   let nextRelease;
 
   if (releaseTags.length === 0) {
@@ -20,6 +22,8 @@ async function main() {
   } else {
     nextRelease = createTagName(Math.max(...releaseTags) + 1);
   }
+
+  console.log(nextRelease);
 
   await pushReleaseTag(nextRelease);
 
