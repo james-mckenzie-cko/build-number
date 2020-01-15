@@ -15,6 +15,7 @@ inputs:
   prefix:
     description: 'Prefix for the build-number-<num> tag to make it unique if tracking multiple build numbers'
     required: false
+    default: 'build-number-'
 
 outputs:
   build_number:

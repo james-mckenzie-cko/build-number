@@ -10,7 +10,8 @@
     "build": "rm -rf ./lib && ncc build src/main.ts -o lib"
   },
   "dependencies": {
-    "@actions/core": "^1.2.0"
+    "@actions/core": "^1.2.0",
+    "axios": "^0.19.1"
   },
   "devDependencies": {
     "@types/node": "^12.0.4",
