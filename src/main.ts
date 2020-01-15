@@ -40,7 +40,11 @@ async function main() {
         const regExp = new RegExp(regExpString);
 
         return result.data
-          .filter(x => regExp.test(x.name))
+          .filter(x => {
+            console.log(regExp.test(x.name));
+
+            return regExp.test(x.name);
+          })
           .map(x => Number(x.name.replace(tagPrefix, '')))
           .sort();
       }
