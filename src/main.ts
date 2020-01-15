@@ -16,17 +16,14 @@ async function main() {
 
   const releaseTags = await getReleaseTags();
 
-  let nextRelease;
+  const nextReleaseNumber =
+    releaseTags.length === 0 ? 1 : Math.max(...releaseTags) + 1;
 
-  if (releaseTags.length === 0) {
-    nextRelease = createTagName(1);
-  } else {
-    nextRelease = createTagName(Math.max(...releaseTags) + 1);
-  }
-
-  console.log(nextRelease);
+  const nextRelease = createTagName(nextReleaseNumber);
 
   await pushReleaseTag(nextRelease);
+
+  await commentOnPr(`released build ${nextReleaseNumber}`);
 
   async function getReleaseTags() {
     try {
@@ -65,29 +62,17 @@ async function main() {
   }
 
   async function commentOnPr(message: string) {
-    // try {
-    //   instance.post(
-    //     `/repos/${process.env.GITHUB_REPOSITORY}/pulls/${
-    //       context.payload.pull_request!.number
-    //     }`
-    //   );
-    // } catch (e) {
-    //   core.setFailed(`Couldn't post comment : ${e.message}`);
-    // }
-
-    // const { owner, repo } = context.repo;
-
-    ghClient.issues.createComment({
+    await ghClient.issues.createComment({
       ...context.repo,
       issue_number: context.payload.pull_request!.number,
-      body: 'hey world',
+      body: message,
     });
   }
 
   function createTagName(buildNumber: number) {
     return {
       ref: `refs/tags/${tagPrefix}${buildNumber}`,
-      sha: process.env.GITHUB_SHA,
+      sha: process.env.GITHUB_SHA!,
     };
   }
 }
