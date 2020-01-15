@@ -5,6 +5,10 @@ runs:
   using: 'node12'
   main: 'main.js'
 inputs:
+  deleteOlderTags:
+    description: 'instruct the action to remove older tags after adding the latest'
+    required: false
+    default: false
   token:
     description: 'GitHub Token to create and delete refs (GITHUB_TOKEN)'
     required: false # Not required when getting the stored build number for later jobs, only in the first jobs when it's generated
