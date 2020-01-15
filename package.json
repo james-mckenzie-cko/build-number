@@ -1,0 +1,21 @@
+{
+  "name": "build-number",
+  "version": "1.0.0",
+  "main": "lib/main.js",
+  "repository": "git@github.com:james-mckenzie-cko/build-number.git",
+  "author": "James McKenzie <james.mckenzie@checkout.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "rm -rf ./lib && ncc build src/main.ts -o lib"
+  },
+  "dependencies": {
+    "@actions/core": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.0.4",
+    "@zeit/ncc": "^0.20.5",
+    "prettier": "1.19.1",
+    "typescript": "^3.5.1"
+  }
+}
