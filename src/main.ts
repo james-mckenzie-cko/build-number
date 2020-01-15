@@ -36,12 +36,13 @@ async function main() {
       >(`/repos/${process.env.GITHUB_REPOSITORY}/tags`);
 
       if (result.data) {
-        const regExpString = `/${tagPrefix}\d+$/`;
+        const regExpString = `${tagPrefix}\d+$`;
         const regExp = new RegExp(regExpString);
 
         return result.data
           .filter(x => {
             console.log(regExp.test(x.name));
+            console.log(x.name);
 
             return regExp.test(x.name);
           })
