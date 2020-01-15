@@ -2,6 +2,11 @@ import * as core from '@actions/core';
 import { context, GitHub } from '@actions/github';
 import axios from 'axios';
 
+interface Tag {
+  name: string;
+  commit: { sha: string };
+}
+
 async function main() {
   const token = core.getInput('token');
   const tagPrefix = core.getInput('prefix');
@@ -14,33 +19,49 @@ async function main() {
 
   instance.defaults.headers.common['Authorization'] = `token ${token}`;
 
-  const releaseTags = await getReleaseTags();
+  const tags = await getTags();
+  const releaseTags = filterTags(tags);
+
+  const releaseTagMapped = releaseTags.map(x => ({
+    number: Number(x.name.replace(tagPrefix, '')),
+    ...x,
+  }));
+
+  const lastRelease = releaseTagMapped.sort((a, b) => {
+    return a.number - b.number;
+  })[0];
 
   const nextReleaseNumber =
-    releaseTags.length === 0 ? 1 : Math.max(...releaseTags) + 1;
+    releaseTags.length === 0
+      ? 1
+      : Math.max(...releaseTagMapped.map(x => x.number)) + 1;
 
   const nextRelease = createTagName(nextReleaseNumber);
 
   await pushReleaseTag(nextRelease);
 
-  await commentOnPr(`released build ${nextReleaseNumber}`);
+  await commentOnPr(`
+    released build ${nextReleaseNumber}
+    diff: [](https://github.com/${process.env.GITHUB_REPOSITORY}/compare/${lastRelease.commit.sha}...${nextRelease.sha}) 
+  `);
 
-  async function getReleaseTags() {
+  /* ((((((((((((((((((((((((((((((())))))))))))))))))))))))))))))) */
+
+  function filterTags(tags: Tag[]) {
+    const regExpString = `${tagPrefix}\\d+$`;
+    const regExp = new RegExp(regExpString);
+
+    return tags.filter(x => regExp.test(x.name));
+  }
+
+  async function getTags() {
     try {
-      const result = await instance.get<
-        {
-          name: string;
-        }[]
-      >(`/repos/${process.env.GITHUB_REPOSITORY}/tags`);
+      const result = await instance.get<Tag[]>(
+        `/repos/${process.env.GITHUB_REPOSITORY}/tags`
+      );
 
       if (result.data) {
-        const regExpString = `${tagPrefix}\\d+$`;
-        const regExp = new RegExp(regExpString);
-
-        return result.data
-          .filter(x => regExp.test(x.name))
-          .map(x => Number(x.name.replace(tagPrefix, '')))
-          .sort();
+        return result.data;
       }
 
       return [];
