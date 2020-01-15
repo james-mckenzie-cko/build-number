@@ -13,6 +13,12 @@ async function main() {
 
   const releaseTags = await getReleaseTags();
 
+  let nextRelease;
+
+  if (releaseTags.length === 0) {
+    nextRelease = createTagName(1);
+  }
+
   console.log(releaseTags);
 
   async function getReleaseTags() {
@@ -22,14 +28,25 @@ async function main() {
       }[]
     >(`/repos/${process.env.GITHUB_REPOSITORY}/tags`);
 
+    console.log(result.data);
+
     if (result.data) {
-      const regExpString = `/${tagPrefix}(\\d+)$`;
+      const regExpString = `/${tagPrefix}\d+$`;
       const regExp = new RegExp(regExpString);
 
-      return result.data.filter(x => regExp.test(x.name));
+      return result.data
+        .filter(x => regExp.test(x.name))
+        .map(x => x.name.replace(tagPrefix, ''));
     }
 
     return [];
+  }
+
+  function createTagName(buildNumber: number) {
+    return {
+      ref: `refs/tags/${tagPrefix}${buildNumber}`,
+      sha: process.env.GITHUB_SHA,
+    };
   }
 }
 
