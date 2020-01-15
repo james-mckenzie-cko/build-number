@@ -1,4 +1,5 @@
 import * as core from '@actions/core';
+import { context, GitHub } from '@actions/github';
 import axios from 'axios';
 
 async function main() {
@@ -8,6 +9,8 @@ async function main() {
   const instance = axios.create({
     baseURL: 'https://api.github.com',
   });
+
+  const ghClient = new GitHub(token);
 
   instance.defaults.headers.common['Authorization'] = `token ${token}`;
 
@@ -59,6 +62,26 @@ async function main() {
     } catch (e) {
       core.setFailed(`Couldn't push Release Tag : ${e.message}`);
     }
+  }
+
+  async function commentOnPr(message: string) {
+    // try {
+    //   instance.post(
+    //     `/repos/${process.env.GITHUB_REPOSITORY}/pulls/${
+    //       context.payload.pull_request!.number
+    //     }`
+    //   );
+    // } catch (e) {
+    //   core.setFailed(`Couldn't post comment : ${e.message}`);
+    // }
+
+    // const { owner, repo } = context.repo;
+
+    ghClient.issues.createComment({
+      ...context.repo,
+      issue_number: context.payload.pull_request!.number,
+      body: 'hey world',
+    });
   }
 
   function createTagName(buildNumber: number) {
