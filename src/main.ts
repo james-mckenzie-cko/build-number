@@ -40,6 +40,8 @@ async function main() {
           .map(x => Number(x.name.replace(tagPrefix, '')))
           .sort();
       }
+      console.log('test');
+
       return [];
     } catch (e) {
       core.setFailed(`Couldn't get Release Tags : ${e.message}`);
