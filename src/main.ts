@@ -44,7 +44,6 @@ async function main() {
       return [];
     } catch (e) {
       core.setFailed(`Couldn't get Release Tags : ${e.message}`);
-    } finally {
       return [];
     }
   }
